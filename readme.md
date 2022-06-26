@@ -1,4 +1,4 @@
-Website: http://scally.xyz
+Website: http://austinboath.xyz
 
 A simple website to display my content, which is mostly outsourced onto social media.
 
