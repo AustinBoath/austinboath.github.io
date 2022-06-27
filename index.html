@@ -1,38 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <title>LinkHub</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com"> 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-</head>
-<body>  
+    <title>Austin Boath</title>
+    <!-- Favicon -->
+    <link rel="icon" href="https://avatars0.githubusercontent.com/u/43749971" type="image/x-icon" />
+    <!-- Font Awesome icons -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+    <!-- Core theme CSS -->
+    <link rel="stylesheet" href="style.css">
+  </head>
 
-    <div class="centered">
-        <img class="profile-img" id="profileImage" alt="'Profile Image">
-        <h2 class="profile-name" id="profileName"></h2>
-        <div id="links"></div>
+  <body>
+    <!-- Parallax Pixel Background Animation -->
+    <section class="animated-background">
+      <div id="stars1"></div>
+      <div id="stars2"></div>
+      <div id="stars3"></div>
+    </section>
+    <!-- End of Parallax Pixel Background Animation -->
+
+    <a id="profilePicture" href="#popup">
+      <img src="https://pbs.twimg.com/profile_images/1535659169537486849/JmabJGMV_400x400.jpg" alt="Profile Picture">
+    </a>
+
+    <div class="overlay" id="popup">
+      <div class="popup">
+        <div class="popup-photo">
+          <a href="https://pbs.twimg.com/profile_images/1535659169537486849/JmabJGMV_400x400.jpg" target="_blank">
+            <img src="https://pbs.twimg.com/profile_images/1535659169537486849/JmabJGMV_400x400.jpg" alt="Profile Picture">
+          </a>
+        </div>
+        <div class="popup-quote">
+          Always keep creating
+        </div>
+        <a class="popup-close" onclick="history.back()">&times;</a>
+      </div>
     </div>
 
+    <div id="userName">
+      @AustinBoath
+    </div>
 
-    <script type="module">
-    import { config } from './config.js'
-    console.log(config)
+    <div id="links">
+      <a class="link" href="https://github.com/johnggli" target="_blank">
+        <i class="fab fa-youtube">&nbsp;</i>Austin's Journey - Bikes & Exploration
+      </a>
+      <a class="link" href="https://www.linkedin.com/in/johnggli" target="_blank">
+        <i class="fab fa-linkedin">&nbsp;</i>Linkedin
+      </a>
+      <a class="link" href="https://www.facebook.com/johnggli" target="_blank">
+        <i class="fab fa-facebook">&nbsp;</i>Facebook
+      </a>
+      <a class="link" href="https://www.instagram.com/johnggli" target="_blank">
+        <i class="fab fa-instagram">&nbsp;</i>Instagram
+      </a>
+      <a class="link" href="https://twitter.com/johnggli" target="_blank">
+        <i class="fab fa-twitter">&nbsp;</i>Twitter
+      </a>
+    </div>
 
-    config.links.forEach(i => {
-        $('#links').append(`
-            <a href="${i.url}" class="link-btn">${i.title}</a>
-        `); 
-    });
-
-    document.getElementById("profileImage").src = config.imageURL;
-    document.getElementById("profileName").innerHTML = config.name;
-    
-    </script>
-</body>
+    <h2> Recent Activity </h2>
+    </div>
+  </body>
 </html>

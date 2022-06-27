@@ -6,4 +6,4 @@ I originally got the idea for this after seeing Vaxer's website. I am just a beg
 
 Log:
 
-27 June, 2022 - Site Redesign Begins
+27 June, 2022 - Site Redesign Begins, the 'old' folder will eventually be moved to another folder for archival purposes.
