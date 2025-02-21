@@ -49,4 +49,47 @@ This site’s where I’ll drop those snippets—projects, thoughts, whatever’
     </footer>
     <script src="script.js"></script>
 </body>
+    <footer>
+    <div class="theme-switcher">
+        <label for="theme-select">Choose Theme:</label>
+        <select id="theme-select" onchange="changeTheme()">
+            <option value="modern">Modern Dark Mode</option>
+            <option value="windows95">Windows 95</option>
+            <option value="early2000s">Early 2000s</option>
+        </select>
+    </div>
+</footer>
+
+<style>
+    body {
+        transition: background-color 0.5s, color 0.5s;
+    }
+
+    .modern {
+        background-color: #121212;
+        color: #ffffff;
+    }
+
+    .windows95 {
+        background-color: #c0c0c0;
+        color: #000000;
+        font-family: 'MS Sans Serif', sans-serif;
+    }
+
+    .early2000s {
+        background-color: #f0f0f0;
+        color: #000000;
+        font-family: 'Comic Sans MS', cursive;
+    }
+</style>
+
+<script>
+    function changeTheme() {
+        const theme = document.getElementById('theme-select').value;
+        document.body.className = theme;
+    }
+
+    // Set default theme
+    document.body.className = 'modern';
+</script>
 </html>
