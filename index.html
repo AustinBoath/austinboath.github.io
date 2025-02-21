@@ -1,60 +1,53 @@
+# Austin Boath's Homepage
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Austin Boath</title>
-    <!-- Favicon -->
-    <link rel="icon" href="nofav" type="image/x-icon" />
-    <!-- Font Awesome icons -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
-    <!-- Core theme CSS -->
-    <link rel="stylesheet" href="style.css">
-  </head>
-
-  <body>
-    <!-- Parallax Pixel Background Animation -->
-    <section class="animated-background">
-      <div id="stars1"></div>
-      <div id="stars2"></div>
-      <div id="stars3"></div>
-    </section>
-    <!-- End of Parallax Pixel Background Animation -->
-
-    <a id="profilePicture" href="#popup">
-      <img src="https://pbs.twimg.com/profile_images/1592001845076971521/x0Rbo6au_400x400.jpg" alt="Profile Picture">
-    </a>
-
-    <div class="overlay" id="popup">
-      <div class="popup">
-        <div class="popup-photo">
-          <a href="https://pbs.twimg.com/profile_images/1535659169537486849/JmabJGMV_400x400.jpg" target="_blank">
-            <img src="https://pbs.twimg.com/profile_images/1592001845076971521/x0Rbo6au_400x400.jpg" alt="Profile Picture">
-          </a>
-        </div>
-        <div class="popup-quote">
-          Always keep creating
-        </div>
-        <a class="popup-close" onclick="history.back()">&times;</a>
-      </div>
-    </div>
-
-    <div id="userName">
-      Austin Boath
-    </div>
-
-    <div id="links">
-      <a class="link" href=https://www.youtube.com/u/realaustinboath target="_blank">
-        <i class="fab fa-youtube">&nbsp;</i>YouTube Channel
-      </a>
-        <a class="link" href="http://austinboath.com" target="_blank">
-          <i class="fab fa-website">&nbsp;</i>About me
-      </a>
-    </div>
-    <div id="userName">
-      Recent Activity
-    </div>
-<iframe height='160' width='300' frameborder='0' allowtransparency='true' scrolling='no' src='https://www.strava.com/athletes/74739430/activity-summary/8a72a120755e6a1a336d7a1aa76b9338b2abd0a4'></iframe>
-    </div>
-  </body>
+    <title>Austin Boath's Homepage</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Austin Boath's Rustic Retreat</h1>
+        <nav>
+            <ul>
+                <li><a href="#about">About</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="about">
+            <h2>About Austin</h2>
+            <p>Discover the charm of rural Australia through the eyes of Austin Boath.</p>
+        </section>
+        <section id="gallery">
+            <h2>Gallery</h2>
+            <div class="image-grid">
+                <img src="image1.jpg" alt="A beautiful landscape">
+                <img src="image2.jpg" alt="A rustic barn">
+                <img src="image3.jpg" alt="A serene lake">
+            </div>
+        </section>
+        <section id="contact">
+            <h2>Contact Me</h2>
+            <form>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" required></textarea>
+                <button type="submit">Send</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 Austin Boath. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
 </html>
