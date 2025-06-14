@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream Progress Bar Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .form-section {
+            padding: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .stats-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 30px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2a5298;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .preview-section {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .preview-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #preview {
+            max-width: 100%;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(42, 82, 152, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚴 Stream Progress Bar Generator</h1>
+            <p>Create professional progress bars for your cycling streams</p>
+        </div>
+
+        <div class="form-section">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="origin">Origin</label>
+                    <input type="text" id="origin" value="Adelaide" placeholder="Starting location">
+                </div>
+                <div class="form-group">
+                    <label for="destination">Destination</label>
+                    <input type="text" id="destination" value="Canberra" placeholder="Destination">
+                </div>
+                <div class="form-group">
+                    <label for="totalDistance">Total Distance (km)</label>
+                    <input type="number" id="totalDistance" value="1200" step="0.1" placeholder="1200">
+                </div>
+                <div class="form-group">
+                    <label for="distanceTravelled">Distance Travelled (km)</label>
+                    <input type="number" id="distanceTravelled" value="450" step="0.1" placeholder="450">
+                </div>
+            </div>
+
+            <div class="stats-display">
+                <div class="stat-item">
+                    <div class="stat-value" id="progressPercent">37.5%</div>
+                    <div class="stat-label">Progress</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="remainingDistance">750.0 km</div>
+                    <div class="stat-label">Remaining</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="estimatedTime">--</div>
+                    <div class="stat-label">Est. Time</div>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <div class="preview-title">Preview</div>
+                <canvas id="preview" width="800" height="200"></canvas>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="generateProgressBar()">Generate Progress Bar</button>
+                <button class="btn btn-success" onclick="downloadImage()">Download PNG</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let canvas = document.getElementById('preview');
+        let ctx = canvas.getContext('2d');
+
+        function updateStats() {
+            const total = parseFloat(document.getElementById('totalDistance').value) || 0;
+            const travelled = parseFloat(document.getElementById('distanceTravelled').value) || 0;
+            
+            const progress = total > 0 ? (travelled / total) * 100 : 0;
+            const remaining = Math.max(total - travelled, 0);
+            
+            document.getElementById('progressPercent').textContent = progress.toFixed(1) + '%';
+            document.getElementById('remainingDistance').textContent = remaining.toFixed(1) + ' km';
+        }
+
+        function drawBicycle(ctx, x, y) {
+            // Bicycle colors
+            const wheelColor = '#2c3e50';
+            const frameColor = '#e74c3c';
+            const accentColor = '#f39c12';
+            const spokeColor = '#34495e';
+            
+            const scale = 0.8;
+            const wheelRadius = 12 * scale;
+            const wheelSeparation = 24 * scale;
+            
+            // Wheel positions
+            const leftWheelX = x - wheelSeparation/2;
+            const rightWheelX = x + wheelSeparation/2;
+            const wheelY = y + 2;
+            
+            // Draw wheels (tires)
+            ctx.fillStyle = wheelColor;
+            ctx.beginPath();
+            ctx.arc(leftWheelX, wheelY, wheelRadius, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(rightWheelX, wheelY, wheelRadius, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Draw wheel rims
+            ctx.fillStyle = '#95a5a6';
+            ctx.beginPath();
+            ctx.arc(leftWheelX, wheelY, wheelRadius - 3, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(rightWheelX, wheelY, wheelRadius - 3, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Draw spokes
+            ctx.strokeStyle = spokeColor;
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * Math.PI * 2) / 8;
+                const spokeLength = wheelRadius - 4;
+                
+                // Left wheel spokes
+                ctx.beginPath();
+                ctx.moveTo(leftWheelX, wheelY);
+                ctx.lineTo(leftWheelX + Math.cos(angle) * spokeLength, wheelY + Math.sin(angle) * spokeLength);
+                ctx.stroke();
+                
+                // Right wheel spokes
+                ctx.beginPath();
+                ctx.moveTo(rightWheelX, wheelY);
+                ctx.lineTo(rightWheelX + Math.cos(angle) * spokeLength, wheelY + Math.sin(angle) * spokeLength);
+                ctx.stroke();
+            }
+            
+            // Frame dimensions
+            const frameY = y - 8;
+            const seatX = x - 6;
+            const seatY = frameY - 8;
+            const handlebarX = x + 8;
+            const handlebarY = frameY - 6;
+            
+            // Draw main frame
+            ctx.strokeStyle = frameColor;
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            ctx.beginPath();
+            // Top tube
+            ctx.moveTo(seatX, seatY);
+            ctx.lineTo(handlebarX, handlebarY);
+            // Seat tube
+            ctx.moveTo(seatX, seatY);
+            ctx.lineTo(leftWheelX, wheelY - wheelRadius + 3);
+            // Down tube
+            ctx.moveTo(handlebarX, handlebarY);
+            ctx.lineTo(leftWheelX, wheelY - wheelRadius + 3);
+            // Chain stay
+            ctx.moveTo(leftWheelX, wheelY - wheelRadius + 3);
+            ctx.lineTo(rightWheelX, wheelY - wheelRadius + 3);
+            // Seat stay
+            ctx.moveTo(seatX, seatY);
+            ctx.lineTo(rightWheelX, wheelY - wheelRadius + 3);
+            ctx.stroke();
+            
+            // Draw seat
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillRect(seatX - 4, seatY - 2, 8, 3);
+            
+            // Draw handlebars
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(handlebarX - 6, handlebarY);
+            ctx.lineTo(handlebarX + 6, handlebarY);
+            ctx.stroke();
+            
+            // Draw pedals
+            ctx.fillStyle = accentColor;
+            ctx.fillRect(leftWheelX - 2, wheelY - 3, 4, 2);
+            
+            // Draw chain ring
+            ctx.strokeStyle = accentColor;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(leftWheelX, wheelY - 3, 6, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            // Add a subtle shadow/glow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetY = 2;
+            
+            // Draw a circular background for the bike
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.beginPath();
+            ctx.arc(x, y, wheelRadius + 8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+        }
+
+        function generateProgressBar() {
+            const origin = document.getElementById('origin').value || 'Adelaide';
+            const destination = document.getElementById('destination').value || 'Canberra';
+            const totalDistance = parseFloat(document.getElementById('totalDistance').value) || 1200;
+            const distanceTravelled = parseFloat(document.getElementById('distanceTravelled').value) || 450;
+            
+            const progress = Math.min(distanceTravelled / totalDistance, 1.0);
+            const remainingDistance = Math.max(totalDistance - distanceTravelled, 0);
+            
+            // Clear canvas
+            ctx.fillStyle = '#1e1e28';
+            ctx.fillRect(0, 0, 800, 200);
+            
+            // Constants
+            const margin = 40;
+            const progressBarY = 110;
+            const progressBarHeight = 20;
+            const progressBarWidth = 800 - (margin * 2);
+            
+            // Title
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${origin} → ${destination}`, 400, 40);
+            
+            // Location markers
+            const startX = margin;
+            const endX = margin + progressBarWidth;
+            
+            // Start location circle
+            ctx.fillStyle = '#4caf50';
+            ctx.beginPath();
+            ctx.arc(startX, progressBarY, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // End location circle
+            ctx.fillStyle = '#f44336';
+            ctx.beginPath();
+            ctx.arc(endX, progressBarY, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Location labels
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText(origin, startX - origin.length * 4, progressBarY - 20);
+            ctx.textAlign = 'right';
+            ctx.fillText(destination, endX + destination.length * 4, progressBarY - 20);
+            
+            // Progress track background
+            ctx.fillStyle = '#505060';
+            ctx.fillRect(startX, progressBarY - progressBarHeight/2, progressBarWidth, progressBarHeight);
+            
+            // Progress fill
+            if (progress > 0) {
+                const fillWidth = progressBarWidth * progress;
+                ctx.fillStyle = '#4caf50';
+                ctx.fillRect(startX, progressBarY - progressBarHeight/2, fillWidth, progressBarHeight);
+            }
+            
+            // Bike icon position
+            const bikeX = startX + (progressBarWidth * progress);
+            const bikeY = progressBarY;
+            
+            // Draw detailed bike icon
+            drawBicycle(ctx, bikeX, bikeY);
+            
+            // Statistics
+            const statsY = 160;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'left';
+            
+            ctx.fillText(`Travelled: ${distanceTravelled.toFixed(1)} km`, margin, statsY);
+            ctx.fillText(`Remaining: ${remainingDistance.toFixed(1)} km`, margin + 200, statsY);
+            ctx.fillText(`Total: ${totalDistance.toFixed(1)} km`, margin + 400, statsY);
+            
+            // Large percentage
+            ctx.fillStyle = '#4caf50';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'right';
+            ctx.fillText(`${(progress * 100).toFixed(1)}%`, 800 - margin, statsY);
+            
+            updateStats();
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            const origin = document.getElementById('origin').value.toLowerCase().replace(/\s+/g, '_');
+            const destination = document.getElementById('destination').value.toLowerCase().replace(/\s+/g, '_');
+            
+            link.download = `progress_${origin}_to_${destination}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // Auto-generate on input change
+        document.getElementById('origin').addEventListener('input', generateProgressBar);
+        document.getElementById('destination').addEventListener('input', generateProgressBar);
+        document.getElementById('totalDistance').addEventListener('input', generateProgressBar);
+        document.getElementById('distanceTravelled').addEventListener('input', generateProgressBar);
+
+        // Initial generation
+        generateProgressBar();
+    </script>
+</body>
+</html>
