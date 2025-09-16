@@ -1,4 +1,4 @@
-I got the sauce: bio.austinboath.com
+
 
 A simple website to display my content, which is mostly outsourced onto social media.
 
