@@ -1,0 +1,693 @@
+.customer-row.completed-order {
+            opacity: 0.7;
+            border-left-color: #48bb78;
+            background: #e6ffe6;
+        }
+
+        .customer-row.completed-order:hover {
+            opacity: 0.9;
+            background: #ccffcc;
+        }
+
+        .customer-row.completed-order .customer-name {
+            text-decoration: none;
+            color: #38a169;
+            font-weight: bold;
+        }
+
+        .customer-row.completed-order .customer-name::after {
+            content: " ✅";
+            margin-left: 8px;
+        }<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darylator - Digital Run Sheet Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAoADwDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP//Z') no-repeat center center fixed,
+                    linear-gradient(135deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.85) 100%);
+            background-size: cover;
+            background-blend-mode: overlay;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #4a5568;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .customer-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .customer-input input {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .customer-input input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #4fd1c7, #06b6d4);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 209, 199, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 101, 101, 0.3);
+        }
+
+        .run-sheets {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .run-sheets {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .run-sheet {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .run-sheet:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .run-sheet h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            padding-bottom: 10px;
+            border-bottom: 3px solid;
+            position: relative;
+        }
+
+        .loading-sheet h2 {
+            border-bottom-color: #667eea;
+        }
+
+        .invoice-sheet h2 {
+            border-bottom-color: #764ba2;
+        }
+
+        .customer-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 2fr 50px;
+            gap: 15px;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border-left: 4px solid;
+        }
+
+        .customer-row:hover {
+            transform: translateX(5px);
+        }
+
+        .customer-row.need-invoice {
+            border-left-color: #f56565;
+            background: #ffe6e6;
+        }
+
+        .customer-row.need-invoice:hover {
+            background: #ffcccc;
+        }
+
+        .customer-row.need-cartons,
+        .customer-row.overloaded {
+            border-left-color: #f6ad55;
+            background: #fffaf0;
+        }
+
+        .customer-row.need-cartons:hover,
+        .customer-row.overloaded:hover {
+            background: #fef5e7;
+        }
+
+        .customer-row.complete {
+            border-left-color: #48bb78;
+            background: #e6ffe6;
+        }
+
+        .customer-row.complete:hover {
+            background: #ccffcc;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1em;
+        }
+
+        .carton-input {
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .carton-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+
+        .status-matched {
+            background: #48bb78;
+            box-shadow: 0 0 10px rgba(72, 187, 120, 0.5);
+        }
+
+        .status-unmatched {
+            background: #f56565;
+            box-shadow: 0 0 10px rgba(245, 101, 101, 0.5);
+        }
+
+        .status-pending {
+            background: #ed8936;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e53e3e;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn:hover {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .summary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .summary h3 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #718096;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .completion-animation {
+            animation: celebrate 0.6s ease-out;
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚛 Darylator</h1>
+            <p>Track your deliveries and carton counts with ease</p>
+            <div style="margin-top: 15px; font-size: 0.9em; color: #718096;">
+                Created by Austin Boath
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="customer-input">
+                <input type="text" id="customerName" placeholder="Enter customer name..." maxlength="50">
+                <button class="btn btn-primary" onclick="addCustomer()">
+                    ➕ Add Customer
+                </button>
+            </div>
+            <button class="btn btn-secondary" onclick="clearAllData()">
+                🗑️ Clear All
+            </button>
+            <button class="btn btn-secondary" onclick="exportData()">
+                📊 Export Data
+            </button>
+            <div class="customer-input">
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(this)">
+                <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">
+                    📥 Import Data
+                </button>
+            </div>
+        </div>
+
+        <div class="run-sheets">
+            <div class="run-sheet">
+                <h2>📦 Customer Run Sheet</h2>
+                <div id="runSheet" class="sheet-content">
+                    <div class="empty-state">No customers added yet. Add a customer to get started!</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary">
+            <h3>📈 Delivery Summary</h3>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalCustomers">0</div>
+                    <div class="stat-label">Total Customers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalLoaded">0</div>
+                    <div class="stat-label">Cartons Loaded</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalInvoiced">0</div>
+                    <div class="stat-label">Cartons Invoiced</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="matchedCustomers">0/0</div>
+                    <div class="stat-label">Customers Completed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="remainingCustomers">0</div>
+                    <div class="stat-label">Remaining Orders</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let customers = {};
+        let customerCounter = 0;
+
+        function addCustomer() {
+            const nameInput = document.getElementById('customerName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                alert('Please enter a customer name');
+                return;
+            }
+            
+            if (customers[name]) {
+                alert('Customer already exists');
+                return;
+            }
+            
+            customers[name] = {
+                loaded: 0,
+                invoiced: 0
+            };
+            
+            nameInput.value = '';
+            renderSheets();
+            updateSummary();
+        }
+
+        function removeCustomer(customerName) {
+            if (confirm(`Remove ${customerName} from the run sheets?`)) {
+                delete customers[customerName];
+                renderSheets();
+                updateSummary();
+            }
+        }
+
+        function updateCartons(customerName, type, value) {
+            if (customers[customerName]) {
+                customers[customerName][type] = parseInt(value) || 0;
+                updateCustomerRow(customerName);
+                updateSummary();
+                
+                // Re-render sheets to maintain proper sorting when completion status changes
+                const customer = customers[customerName];
+                const isComplete = customer.loaded > 0 && customer.loaded === customer.invoiced;
+                
+                // Add a small delay to show the completion animation before reordering
+                if (isComplete) {
+                    setTimeout(() => {
+                        renderSheets();
+                    }, 650); // Slightly longer than the animation duration
+                } else {
+                    // For incomplete orders, re-render immediately to move back to top if needed
+                    setTimeout(() => {
+                        renderSheets();
+                    }, 50);
+                }
+            }
+        }
+
+        function updateCustomerRow(customerName) {
+            const row = document.getElementById(`customer-${customerName}`);
+            
+            if (row) {
+                const customer = customers[customerName];
+                const loaded = customer.loaded || 0;
+                const invoiced = customer.invoiced || 0;
+                
+                // Remove all status classes
+                row.className = 'customer-row';
+                
+                // Determine status and apply appropriate class
+                if (invoiced === 0) {
+                    row.classList.add('need-invoice');
+                } else if (loaded === invoiced && loaded > 0) {
+                    row.classList.add('complete', 'completed-order');
+                } else if (loaded > invoiced) {
+                    row.classList.add('overloaded');
+                } else {
+                    row.classList.add('need-cartons');
+                }
+                
+                // Update status tag
+                const statusTag = row.querySelector('.status-tag');
+                if (statusTag) {
+                    statusTag.className = 'status-tag';
+                    
+                    if (invoiced === 0) {
+                        statusTag.classList.add('status-need-invoice');
+                        statusTag.textContent = 'Need Invoice';
+                    } else if (loaded === invoiced && loaded > 0) {
+                        statusTag.classList.add('status-complete');
+                        statusTag.textContent = 'Complete ✓';
+                    } else if (loaded > invoiced) {
+                        statusTag.classList.add('status-overloaded');
+                        statusTag.textContent = 'Overloaded';
+                    } else {
+                        statusTag.classList.add('status-need-cartons');
+                        const needed = invoiced - loaded;
+                        statusTag.textContent = `Need ${needed} cartons`;
+                    }
+                }
+            }
+        }
+
+        function renderSheets() {
+            const runSheet = document.getElementById('runSheet');
+            
+            if (Object.keys(customers).length === 0) {
+                runSheet.innerHTML = '<div class="empty-state">No customers added yet. Add a customer to get started!</div>';
+                return;
+            }
+            
+            // Sort customers: incomplete orders first, then completed ones
+            const sortedCustomers = Object.keys(customers).sort((a, b) => {
+                const customerA = customers[a];
+                const customerB = customers[b];
+                
+                const isCompleteA = customerA.loaded > 0 && customerA.loaded === customerA.invoiced;
+                const isCompleteB = customerB.loaded > 0 && customerB.loaded === customerB.invoiced;
+                
+                // Incomplete orders first
+                if (isCompleteA && !isCompleteB) return 1;
+                if (!isCompleteA && isCompleteB) return -1;
+                
+                // Within same completion status, sort alphabetically
+                return a.localeCompare(b);
+            });
+            
+            let runHTML = '';
+            
+            sortedCustomers.forEach(customerName => {
+                const customer = customers[customerName];
+                const safeCustomerName = customerName.replace(/[^a-zA-Z0-9]/g, '_');
+                const isComplete = customer.loaded > 0 && customer.loaded === customer.invoiced;
+                
+                const completedClass = isComplete ? ' completed-order' : '';
+                
+                runHTML += `
+                    <div class="customer-row${completedClass}" id="customer-${safeCustomerName}">
+                        <div class="customer-name">${customerName}</div>
+                        <input type="number" class="carton-input" 
+                               value="${customer.loaded || ''}" 
+                               placeholder="0"
+                               min="0"
+                               onchange="updateCartons('${customerName}', 'loaded', this.value)">
+                        <input type="number" class="carton-input" 
+                               value="${customer.invoiced || ''}" 
+                               placeholder="0"
+                               min="0"
+                               onchange="updateCartons('${customerName}', 'invoiced', this.value)">
+                        <div class="status-tag">Loading...</div>
+                        <button class="delete-btn" onclick="removeCustomer('${customerName}')" title="Remove customer">×</button>
+                    </div>
+                `;
+            });
+            
+            runSheet.innerHTML = runHTML;
+            
+            // Update all customer rows
+            Object.keys(customers).forEach(customerName => {
+                updateCustomerRow(customerName);
+            });
+        }
+
+        function updateSummary() {
+            const totalCustomersElem = document.getElementById('totalCustomers');
+            const totalLoadedElem = document.getElementById('totalLoaded');
+            const totalInvoicedElem = document.getElementById('totalInvoiced');
+            const matchedCustomersElem = document.getElementById('matchedCustomers');
+            const remainingCustomersElem = document.getElementById('remainingCustomers');
+            
+            const customerNames = Object.keys(customers);
+            const totalCustomers = customerNames.length;
+            const totalLoaded = customerNames.reduce((sum, name) => sum + (customers[name].loaded || 0), 0);
+            const totalInvoiced = customerNames.reduce((sum, name) => sum + (customers[name].invoiced || 0), 0);
+            const matchedCustomers = customerNames.filter(name => {
+                const customer = customers[name];
+                return customer.loaded > 0 && customer.loaded === customer.invoiced;
+            }).length;
+            const remainingCustomers = totalCustomers - matchedCustomers;
+            
+            totalCustomersElem.textContent = totalCustomers;
+            totalLoadedElem.textContent = totalLoaded;
+            totalInvoicedElem.textContent = totalInvoiced;
+            matchedCustomersElem.textContent = `${matchedCustomers}/${totalCustomers}`;
+            remainingCustomersElem.textContent = remainingCustomers;
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                customers = {};
+                renderSheets();
+                updateSummary();
+            }
+        }
+
+        function exportData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                customers: customers,
+                summary: {
+                    totalCustomers: Object.keys(customers).length,
+                    totalLoaded: Object.keys(customers).reduce((sum, name) => sum + (customers[name].loaded || 0), 0),
+                    totalInvoiced: Object.keys(customers).reduce((sum, name) => sum + (customers[name].invoiced || 0), 0)
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `darylator-data-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.customers && typeof data.customers === 'object') {
+                        if (Object.keys(customers).length > 0) {
+                            if (!confirm('This will replace your current data. Are you sure you want to continue?')) {
+                                input.value = ''; // Clear the file input
+                                return;
+                            }
+                        }
+                        
+                        customers = data.customers;
+                        renderSheets();
+                        updateSummary();
+                        alert('Data imported successfully!');
+                    } else {
+                        alert('Invalid file format. Please select a valid Darylator export file.');
+                    }
+                } catch (error) {
+                    alert('Error reading file. Please make sure it\'s a valid JSON file.');
+                }
+                
+                input.value = ''; // Clear the file input
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // Handle Enter key for adding customers
+        document.getElementById('customerName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addCustomer();
+            }
+        });
+
+        // Initialize the app
+        renderSheets();
+        updateSummary();
+    </script>
+</body>
+</html>
