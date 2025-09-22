@@ -1,21 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Austin Boath</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Austin Boath's Transport Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background-color: #f8f8f8;
+            color: #333;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, #1a3c5e, #2a6b9e);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        header p {
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .project-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+        .project-card h3 {
+            color: #2a6b9e;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+        .project-card p {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .project-card a {
+            color: #4db8ff;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        .project-card a:hover {
+            text-decoration: underline;
+        }
+        .project-card .status {
+            font-style: italic;
+            color: #888;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .about {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .about h2 {
+            color: #2a6b9e;
+            margin-bottom: 0.5rem;
+        }
+        footer {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        footer p {
+            margin: 0.3rem 0;
+        }
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.6rem;
+            }
+            header p {
+                font-size: 0.9rem;
+            }
+            .project-card {
+                padding: 1rem;
+            }
+            .project-card h3 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- Hero Section -->
-<h1> Austin Boath </h1>
-  <h2> My Projects </h2>
-  <h2> Route Progress Calculator & Map </h2>
-  <p> A simple program to display route progress on a map: <a href=https://www.austinboath.com/OpenVirtualJourney>OpenVirtualJourney</a></p>
-  <h2>Cycling Progress Bar Image Generator</h2>
-  <p>Simple Program to create a progress bar for cycling journeys along a linear distance: <a href=https://www.austinboath.com/ProgressBar>ProgressBar</a></p>
-<h2> Run Sheet Carton Counter </h2>
-  <p>An automated carton counter prototype for multi-drop local delivery drivers: <a href=https://www.austinboath.com/runsheet></a>Runsheet</p>
-  <h2> Heavy Vehicle Turning Simulation </h2>
-  <p> A visual demonstration on how heavy vehicles turn, comparing rigid trucks to articulated vehicles. <a href=https://www.austinboath.com/truckturn>Truck Turning Simulator</a></p>
+    <header>
+        <h1>Austin Boath's Transport Tools</h1>
+        <p>Practical utilities for transportation, navigation, and mapping, built by a passionate transport professional.</p>
+    </header>
+
+    <div class="container">
+        <section class="projects">
+            <h2>My Projects</h2>
+            <div class="project-card">
+                <h3>Route Progress Calculator & Map</h3>
+                <p>A tool to visualize route progress on a map, designed for real-time journey tracking.</p>
+                <a href="OpenVirtualJourney">View Project</a>
+                <p class="status">Status: Complete</p>
+            </div>
+            <div class="project-card">
+                <h3>Cycling Progress Bar Image Generator</h3>
+                <p>Creates visual progress bars for cycling journeys along a linear distance.</p>
+                <a href="ProgressBar">View Project</a>
+                <p class="status">Status: Complete</p>
+            </div>
+            <div class="project-card">
+                <h3>Run Sheet Carton Counter</h3>
+                <p>An automated prototype for multi-drop delivery drivers to count cartons efficiently.</p>
+                <a href="Runsheet">View Project</a>
+                <p class="status">Status: Collecting Feedback from colleagues to improve</p>
+            </div>
+            <div class="project-card">
+                <h3>Heavy Vehicle Turning Simulation</h3>
+                <p>A visual tool comparing turning dynamics of rigid trucks and articulated vehicles.</p>
+                <a href="Truck Turning Simulator">View Project</a>
+                <p class="status">Status: Very buggy, Work in progress</p>
+            </div>
+        </section>
+
+        <section class="about">
+            <h2>About Me</h2>
+            <p>I'm Austin Boath, a young transport professional with an MR license, working towards my Private Pilot License. I’m passionate about connecting the world through transportation and mapping. As a contributor to OpenStreetMap, I find purpose in improving navigation tools. My projects, inspired by my experiences as a truck driver, cyclist, and runner, are practical utilities for transport and logistics, built to solve real-world problems.</p>
+        </section>
+    </div>
+
+    <footer>
+        <p>Austin Boath's Transport Tools</p>
+        <p>Connecting the world through transportation and mapping.</p>
+        <p>&copy; 2025 Austin Boath. All rights reserved.</p>
+    </footer>
 </body>
 </html>
