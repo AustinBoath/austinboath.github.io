@@ -1,160 +1,507 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BedSpace Navigator</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        body { margin: 0; font-family: Arial, sans-serif; background: #f0f0f0; }
-        #container { text-align: center; padding: 20px; }
-        #coords { font-size: 24px; font-weight: bold; margin: 20px 0; }
-        #map { height: 400px; width: 100%; max-width: 600px; margin: 0 auto; border: 1px solid #ccc; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 10px; }
-        input { padding: 8px; font-size: 16px; }
-    </style>
-</head>
-<body>
-    <div id="container">
-        <h1>BedSpace Navigator</h1>
-        <div id="coords">X: 0, Y: 0, Z: 0</div>
-        <input type="text" id="address" placeholder="Enter bed address or use GPS">
-        <button onclick="setBedLocation()">Set Bed Location</button>
-        <button onclick="setBedWithGPS()">Use Current Location as Bed</button>
-        <div id="map"></div>
+import React, { useState, useEffect, useRef } from 'react';
+import { Home, Navigation, RotateCcw, MapPin } from 'lucide-react';
+
+// Simple encryption/decryption using base64 (for demo - use crypto in production)
+const encrypt = (data) => btoa(JSON.stringify(data));
+const decrypt = (data) => {
+  try {
+    return JSON.parse(atob(data));
+  } catch {
+    return null;
+  }
+};
+
+const COOKIE_NAME = 'bedspace_location';
+const OPENTOPO_API = 'https://api.opentopodata.org/v1/aster30m';
+
+// Haversine formula for distance calculation
+const haversineDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371000; // Earth radius in meters
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) *
+    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+};
+
+// Calculate X (East/West) and Z (North/South) offsets
+const calculateOffsets = (bedLat, bedLon, userLat, userLon) => {
+  const x = haversineDistance(bedLat, bedLon, bedLat, userLon) * (userLon > bedLon ? 1 : -1);
+  const z = haversineDistance(bedLat, bedLon, userLat, bedLon) * (userLat < bedLat ? 1 : -1);
+  return { x, z };
+};
+
+// Fetch altitude from OpenTopoData
+const fetchAltitude = async (lat, lon) => {
+  try {
+    const response = await fetch(`${OPENTOPO_API}?locations=${lat},${lon}`);
+    const data = await response.json();
+    return data.results?.[0]?.elevation || 0;
+  } catch (error) {
+    console.error('Altitude fetch error:', error);
+    return 0;
+  }
+};
+
+// Cookie management
+const saveBedLocation = (lat, lon, alt) => {
+  const data = encrypt({ lat, lon, alt, timestamp: Date.now() });
+  document.cookie = `${COOKIE_NAME}=${data}; max-age=31536000; path=/; SameSite=Strict`;
+};
+
+const loadBedLocation = () => {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === COOKIE_NAME) {
+      return decrypt(value);
+    }
+  }
+  return null;
+};
+
+const deleteBedLocation = () => {
+  document.cookie = `${COOKIE_NAME}=; max-age=0; path=/`;
+};
+
+// Simple 2D Map Component
+const SimpleMap = ({ bedLocation, userLocation }) => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !bedLocation) return;
+
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Clear canvas
+    ctx.fillStyle = '#1f2937';
+    ctx.fillRect(0, 0, width, height);
+
+    // Draw grid
+    ctx.strokeStyle = '#374151';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < width; i += 50) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, height);
+      ctx.stroke();
+    }
+    for (let i = 0; i < height; i += 50) {
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(width, i);
+      ctx.stroke();
+    }
+
+    // Calculate scale and position
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    // Draw bed marker (center)
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 12, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = '#dc2626';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Draw bed label
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText('BED', centerX - 18, centerY - 20);
+
+    // Draw user marker if available
+    if (userLocation) {
+      const { x, z } = calculateOffsets(
+        bedLocation.lat,
+        bedLocation.lon,
+        userLocation.lat,
+        userLocation.lon
+      );
+
+      // Scale: 100 meters = 50 pixels
+      const scale = 0.5;
+      const userX = centerX + (x * scale);
+      const userY = centerY + (z * scale);
+
+      // Draw line from bed to user
+      ctx.strokeStyle = '#60a5fa';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(userX, userY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw distance
+      const distance = Math.sqrt(x * x + z * z);
+      ctx.fillStyle = '#60a5fa';
+      ctx.font = '12px sans-serif';
+      ctx.fillText(
+        `${Math.round(distance)}m`,
+        (centerX + userX) / 2 + 10,
+        (centerY + userY) / 2 - 5
+      );
+
+      // Draw user marker
+      ctx.fillStyle = '#3b82f6';
+      ctx.beginPath();
+      ctx.arc(userX, userY, 10, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw user label
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText('YOU', userX - 15, userY - 15);
+    }
+
+    // Draw compass
+    const compassX = width - 60;
+    const compassY = 60;
+    ctx.strokeStyle = '#6b7280';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(compassX, compassY, 30, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    // North arrow
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.moveTo(compassX, compassY - 25);
+    ctx.lineTo(compassX - 5, compassY - 10);
+    ctx.lineTo(compassX + 5, compassY - 10);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText('N', compassX - 5, compassY - 30);
+
+  }, [bedLocation, userLocation]);
+
+  return (
+    <div className="relative w-full h-full bg-gray-800">
+      <canvas
+        ref={canvasRef}
+        width={800}
+        height={600}
+        className="w-full h-full"
+      />
+      <div className="absolute top-4 left-4 bg-gray-900 bg-opacity-90 p-3 rounded text-xs text-gray-300">
+        <div className="font-semibold mb-1">Map Scale</div>
+        <div>100m = 50 pixels</div>
+        <div className="flex items-center gap-2 mt-2">
+          <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+          <span>Bed</span>
+        </div>
+        <div className="flex items-center gap-2 mt-1">
+          <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+          <span>You</span>
+        </div>
+      </div>
     </div>
+  );
+};
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        // Cookie handling
-        function setCookie(name, value, days) {
-            const expires = new Date(Date.now() + days * 864e5).toUTCString();
-            document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))}; expires=${expires}; path=/`;
+const BedSpaceNavigator = () => {
+  const [bedLocation, setBedLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [coordinates, setCoordinates] = useState({ x: 0, y: 0, z: 0 });
+  const [address, setAddress] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [trackingActive, setTrackingActive] = useState(false);
+  const watchIdRef = useRef(null);
+
+  // Load bed location from cookie on mount
+  useEffect(() => {
+    const saved = loadBedLocation();
+    if (saved) {
+      setBedLocation(saved);
+    }
+  }, []);
+
+  // Start tracking user location
+  const startTracking = () => {
+    if (!navigator.geolocation) {
+      setError('Geolocation not supported');
+      return;
+    }
+
+    setTrackingActive(true);
+    setError('');
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      async (position) => {
+        const { latitude, longitude, altitude } = position.coords;
+        const userAlt = altitude || await fetchAltitude(latitude, longitude);
+        
+        setUserLocation({ lat: latitude, lon: longitude, alt: userAlt });
+
+        if (bedLocation) {
+          const { x, z } = calculateOffsets(bedLocation.lat, bedLocation.lon, latitude, longitude);
+          setCoordinates({
+            x: Math.round(x),
+            y: Math.round(userAlt),
+            z: Math.round(z)
+          });
         }
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return JSON.parse(decodeURIComponent(parts.pop().split(';').shift()));
-            return null;
-        }
+      },
+      (err) => {
+        setError(`Location error: ${err.message}`);
+        setTrackingActive(false);
+      },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+    );
+  };
 
-        // Haversine formula for distance in meters
-        function haversineDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371e3; // Earth's radius in meters
-            const φ1 = lat1 * Math.PI / 180;
-            const φ2 = lat2 * Math.PI / 180;
-            const Δφ = (lat2 - lat1) * Math.PI / 180;
-            const Δλ = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        }
+  // Stop tracking
+  const stopTracking = () => {
+    if (watchIdRef.current) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+    setTrackingActive(false);
+  };
 
-        // Calculate X, Z coordinates
-        function calculateCoordinates(bedLat, bedLon, userLat, userLon) {
-            const R = 6371e3; // Earth's radius in meters
-            const Δlat = (userLat - bedLat) * Math.PI / 180;
-            const Δlon = (userLon - bedLon) * Math.PI / 180;
-            const meanLat = ((bedLat + userLat) / 2) * Math.PI / 180;
-            const x = R * Δlon * Math.cos(meanLat); // East-West (East: +X, West: -X)
-            const z = -R * Δlat; // North-South (South: +Z, North: -Z)
-            return { x: Math.round(x), z: Math.round(z) };
-        }
+  // Set bed location using current GPS
+  const setBedFromGPS = async () => {
+    setLoading(true);
+    setError('');
 
-        // Initialize map
-        const map = L.map('map').setView([0, 0], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-        let userMarker = L.marker([0, 0]).addTo(map);
-        let bedMarker = null;
+    try {
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000
+        });
+      });
 
-        // Load bed location from cookie
-        let bed = getCookie('bedLocation') || null;
+      const { latitude, longitude, altitude } = position.coords;
+      const bedAlt = altitude || await fetchAltitude(latitude, longitude);
+      
+      const newBed = { lat: latitude, lon: longitude, alt: bedAlt };
+      setBedLocation(newBed);
+      saveBedLocation(latitude, longitude, bedAlt);
+      
+      setError('');
+    } catch (err) {
+      setError(`GPS error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        // Update coordinates display
-        function updateCoordinates(pos) {
-            if (!bed) {
-                document.getElementById('coords').textContent = 'Set bed location first';
-                return;
-            }
-            const { x, z } = calculateCoordinates(bed.lat, bed.lon, pos.coords.latitude, pos.coords.longitude);
-            const y = Math.round(pos.coords.altitude || 0); // Fallback to 0 if no altitude
-            document.getElementById('coords').textContent = `X: ${x}, Y: ${y}, Z: ${z}`;
-            userMarker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
-            map.setView([pos.coords.latitude, pos.coords.longitude], 13);
-        }
+  // Set bed location from address
+  const setBedFromAddress = async () => {
+    if (!address.trim()) {
+      setError('Please enter an address');
+      return;
+    }
 
-        // Geolocation watch
-        function startTracking() {
-            if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(updateCoordinates, err => {
-                    console.error(err);
-                    alert('Geolocation error: ' + err.message);
-                }, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 });
-            } else {
-                alert('Geolocation not supported');
-            }
-        }
+    setLoading(true);
+    setError('');
 
-        // Set bed location via address
-        async function setBedLocation() {
-            const address = document.getElementById('address').value;
-            if (!address) {
-                alert('Please enter an address');
-                return;
-            }
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`);
-                const data = await response.json();
-                if (data.length === 0) {
-                    alert('Address not found');
-                    return;
-                }
-                const { lat, lon } = data[0];
-                // Fetch altitude from OpenTopoData
-                const topoResponse = await fetch(`https://api.opentopodata.org/v1/srtm90m?locations=${lat},${lon}`);
-                const topoData = await topoResponse.json();
-                const altitude = topoData.results[0].elevation || 0;
-                bed = { lat: parseFloat(lat), lon: parseFloat(lon), altitude };
-                setCookie('bedLocation', bed, 30);
-                if (bedMarker) map.removeLayer(bedMarker);
-                bedMarker = L.marker([lat, lon], { icon: L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [25, 41] }) }).addTo(map);
-                alert('Bed location set');
-            } catch (err) {
-                console.error(err);
-                alert('Error setting bed location');
-            }
-        }
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
+      );
+      const data = await response.json();
 
-        // Set bed location using current GPS
-        function setBedWithGPS() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async pos => {
-                    const lat = pos.coords.latitude;
-                    const lon = pos.coords.longitude;
-                    const topoResponse = await fetch(`https://api.opentopodata.org/v1/srtm90m?locations=${lat},${lon}`);
-                    const topoData = await topoResponse.json();
-                    const altitude = topoData.results[0].elevation || 0;
-                    bed = { lat, lon, altitude };
-                    setCookie('bedLocation', bed, 30);
-                    if (bedMarker) map.removeLayer(bedMarker);
-                    bedMarker = L.marker([lat, lon], { icon: L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [25, 41] }) }).addTo(map);
-                    alert('Bed location set to current position');
-                }, err => {
-                    console.error(err);
-                    alert('Error getting GPS: ' + err.message);
-                });
-            } else {
-                alert('Geolocation not supported');
-            }
-        }
+      if (data.length === 0) {
+        setError('Address not found');
+        setLoading(false);
+        return;
+      }
 
-        // Initialize
-        if (bed) {
-            bedMarker = L.marker([bed.lat, bed.lon], { icon: L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [25, 41] }) }).addTo(map);
-            map.setView([bed.lat, bed.lon], 13);
-        }
-        startTracking();
-    </script>
-</body>
-</html>
+      const { lat, lon } = data[0];
+      const bedAlt = await fetchAltitude(parseFloat(lat), parseFloat(lon));
+      
+      const newBed = { lat: parseFloat(lat), lon: parseFloat(lon), alt: bedAlt };
+      setBedLocation(newBed);
+      saveBedLocation(newBed.lat, newBed.lon, bedAlt);
+      
+      setAddress('');
+      setError('');
+    } catch (err) {
+      setError(`Address lookup failed: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Reset bed location
+  const resetBed = () => {
+    setBedLocation(null);
+    deleteBedLocation();
+    stopTracking();
+    setCoordinates({ x: 0, y: 0, z: 0 });
+    setUserLocation(null);
+  };
+
+  // Auto-start tracking when bed is set
+  useEffect(() => {
+    if (bedLocation && !trackingActive) {
+      startTracking();
+    }
+    return () => stopTracking();
+  }, [bedLocation]);
+
+  return (
+    <div className="flex flex-col h-screen bg-gray-900 text-white">
+      {/* Header */}
+      <div className="bg-gray-800 p-4 shadow-lg">
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          <Navigation className="w-6 h-6" />
+          BedSpace Navigator
+        </h1>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        {/* Sidebar */}
+        <div className="lg:w-96 bg-gray-800 p-6 overflow-y-auto">
+          {!bedLocation ? (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <Home className="w-5 h-5" />
+                Set Bed Location
+              </h2>
+              
+              <div>
+                <label className="block text-sm mb-2">Enter Address</label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && setBedFromAddress()}
+                  placeholder="123 Main St, City"
+                  className="w-full px-3 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 outline-none"
+                  disabled={loading}
+                />
+                <button
+                  onClick={setBedFromAddress}
+                  disabled={loading}
+                  className="mt-2 w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  <MapPin className="w-4 h-4" />
+                  Set from Address
+                </button>
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-600"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-gray-800 text-gray-400">OR</span>
+                </div>
+              </div>
+
+              <button
+                onClick={setBedFromGPS}
+                disabled={loading}
+                className="w-full bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <Navigation className="w-4 h-4" />
+                Use Current GPS Location
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Coordinates</h2>
+                <div className="bg-gray-900 p-4 rounded-lg space-y-2">
+                  <div className="text-3xl font-bold font-mono">
+                    ({coordinates.x}, {coordinates.y}, {coordinates.z})
+                  </div>
+                  <div className="text-sm text-gray-400 space-y-1">
+                    <div>X: {coordinates.x > 0 ? 'East' : 'West'} {Math.abs(coordinates.x)}m</div>
+                    <div>Y: {coordinates.y}m above sea level</div>
+                    <div>Z: {coordinates.z > 0 ? 'South' : 'North'} {Math.abs(coordinates.z)}m</div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold mb-2 text-gray-400">Bed Location</h3>
+                <div className="bg-gray-900 p-3 rounded text-sm space-y-1">
+                  <div>Lat: {bedLocation.lat.toFixed(6)}°</div>
+                  <div>Lon: {bedLocation.lon.toFixed(6)}°</div>
+                  <div>Alt: {Math.round(bedLocation.alt)}m</div>
+                </div>
+              </div>
+
+              {userLocation && (
+                <div>
+                  <h3 className="text-sm font-semibold mb-2 text-gray-400">Your Location</h3>
+                  <div className="bg-gray-900 p-3 rounded text-sm space-y-1">
+                    <div>Lat: {userLocation.lat.toFixed(6)}°</div>
+                    <div>Lon: {userLocation.lon.toFixed(6)}°</div>
+                    <div>Alt: {Math.round(userLocation.alt)}m</div>
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-4 border-t border-gray-700">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`w-3 h-3 rounded-full ${trackingActive ? 'bg-green-500 animate-pulse' : 'bg-gray-600'}`}></div>
+                  <span className="text-sm">{trackingActive ? 'Tracking Active' : 'Tracking Inactive'}</span>
+                </div>
+                <button
+                  onClick={resetBed}
+                  className="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded font-medium flex items-center justify-center gap-2"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Reset Bed Location
+                </button>
+              </div>
+            </div>
+          )}
+
+          {error && (
+            <div className="mt-4 bg-red-900/50 border border-red-700 p-3 rounded text-sm">
+              {error}
+            </div>
+          )}
+
+          {loading && (
+            <div className="mt-4 text-center text-sm text-gray-400">
+              Loading...
+            </div>
+          )}
+        </div>
+
+        {/* Map */}
+        <div className="flex-1 relative">
+          {bedLocation ? (
+            <SimpleMap bedLocation={bedLocation} userLocation={userLocation} />
+          ) : (
+            <div className="h-full flex items-center justify-center bg-gray-700">
+              <div className="text-center text-gray-400">
+                <MapPin className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                <p>Set your bed location to start tracking</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BedSpaceNavigator;
