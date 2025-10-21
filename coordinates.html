@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Home, Navigation, RotateCcw, MapPin } from 'lucide-react';
 
-// Simple encryption/decryption using base64 (for demo - use crypto in production)
+// Simple encryption/decryption using base64
 const encrypt = (data) => btoa(JSON.stringify(data));
 const decrypt = (data) => {
   try {
@@ -16,7 +16,7 @@ const OPENTOPO_API = 'https://api.opentopodata.org/v1/aster30m';
 
 // Haversine formula for distance calculation
 const haversineDistance = (lat1, lon1, lat2, lon2) => {
-  const R = 6371000; // Earth radius in meters
+  const R = 6371000;
   const φ1 = lat1 * Math.PI / 180;
   const φ2 = lat2 * Math.PI / 180;
   const Δφ = (lat2 - lat1) * Math.PI / 180;
@@ -30,14 +30,14 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
   return R * c;
 };
 
-// Calculate X (East/West) and Z (North/South) offsets
+// Calculate X and Z offsets
 const calculateOffsets = (bedLat, bedLon, userLat, userLon) => {
   const x = haversineDistance(bedLat, bedLon, bedLat, userLon) * (userLon > bedLon ? 1 : -1);
   const z = haversineDistance(bedLat, bedLon, userLat, bedLon) * (userLat < bedLat ? 1 : -1);
   return { x, z };
 };
 
-// Fetch altitude from OpenTopoData
+// Fetch altitude
 const fetchAltitude = async (lat, lon) => {
   try {
     const response = await fetch(`${OPENTOPO_API}?locations=${lat},${lon}`);
@@ -82,11 +82,9 @@ const SimpleMap = ({ bedLocation, userLocation }) => {
     const width = canvas.width;
     const height = canvas.height;
 
-    // Clear canvas
     ctx.fillStyle = '#1f2937';
     ctx.fillRect(0, 0, width, height);
 
-    // Draw grid
     ctx.strokeStyle = '#374151';
     ctx.lineWidth = 1;
     for (let i = 0; i < width; i += 50) {
@@ -102,11 +100,9 @@ const SimpleMap = ({ bedLocation, userLocation }) => {
       ctx.stroke();
     }
 
-    // Calculate scale and position
     const centerX = width / 2;
     const centerY = height / 2;
 
-    // Draw bed marker (center)
     ctx.fillStyle = '#ef4444';
     ctx.beginPath();
     ctx.arc(centerX, centerY, 12, 0, 2 * Math.PI);
@@ -115,12 +111,10 @@ const SimpleMap = ({ bedLocation, userLocation }) => {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Draw bed label
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 14px sans-serif';
     ctx.fillText('BED', centerX - 18, centerY - 20);
 
-    // Draw user marker if available
     if (userLocation) {
       const { x, z } = calculateOffsets(
         bedLocation.lat,
@@ -129,12 +123,10 @@ const SimpleMap = ({ bedLocation, userLocation }) => {
         userLocation.lon
       );
 
-      // Scale: 100 meters = 50 pixels
       const scale = 0.5;
       const userX = centerX + (x * scale);
       const userY = centerY + (z * scale);
 
-      // Draw line from bed to user
       ctx.strokeStyle = '#60a5fa';
       ctx.lineWidth = 2;
       ctx.setLineDash([5, 5]);
@@ -144,7 +136,6 @@ const SimpleMap = ({ bedLocation, userLocation }) => {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Draw distance
       const distance = Math.sqrt(x * x + z * z);
       ctx.fillStyle = '#60a5fa';
       ctx.font = '12px sans-serif';
@@ -154,7 +145,6 @@ const SimpleMap = ({ bedLocation, userLocation }) => {
         (centerY + userY) / 2 - 5
       );
 
-      // Draw user marker
       ctx.fillStyle = '#3b82f6';
       ctx.beginPath();
       ctx.arc(userX, userY, 10, 0, 2 * Math.PI);
@@ -163,13 +153,11 @@ const SimpleMap = ({ bedLocation, userLocation }) => {
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Draw user label
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 12px sans-serif';
       ctx.fillText('YOU', userX - 15, userY - 15);
     }
 
-    // Draw compass
     const compassX = width - 60;
     const compassY = 60;
     ctx.strokeStyle = '#6b7280';
@@ -178,7 +166,6 @@ const SimpleMap = ({ bedLocation, userLocation }) => {
     ctx.arc(compassX, compassY, 30, 0, 2 * Math.PI);
     ctx.stroke();
 
-    // North arrow
     ctx.fillStyle = '#ef4444';
     ctx.beginPath();
     ctx.moveTo(compassX, compassY - 25);
@@ -227,7 +214,6 @@ const BedSpaceNavigator = () => {
   const [trackingActive, setTrackingActive] = useState(false);
   const watchIdRef = useRef(null);
 
-  // Load bed location from cookie on mount
   useEffect(() => {
     const saved = loadBedLocation();
     if (saved) {
@@ -235,7 +221,6 @@ const BedSpaceNavigator = () => {
     }
   }, []);
 
-  // Start tracking user location
   const startTracking = () => {
     if (!navigator.geolocation) {
       setError('Geolocation not supported');
@@ -269,7 +254,6 @@ const BedSpaceNavigator = () => {
     );
   };
 
-  // Stop tracking
   const stopTracking = () => {
     if (watchIdRef.current) {
       navigator.geolocation.clearWatch(watchIdRef.current);
@@ -278,7 +262,6 @@ const BedSpaceNavigator = () => {
     setTrackingActive(false);
   };
 
-  // Set bed location using current GPS
   const setBedFromGPS = async () => {
     setLoading(true);
     setError('');
@@ -306,7 +289,6 @@ const BedSpaceNavigator = () => {
     }
   };
 
-  // Set bed location from address
   const setBedFromAddress = async () => {
     if (!address.trim()) {
       setError('Please enter an address');
@@ -344,7 +326,6 @@ const BedSpaceNavigator = () => {
     }
   };
 
-  // Reset bed location
   const resetBed = () => {
     setBedLocation(null);
     deleteBedLocation();
@@ -353,7 +334,6 @@ const BedSpaceNavigator = () => {
     setUserLocation(null);
   };
 
-  // Auto-start tracking when bed is set
   useEffect(() => {
     if (bedLocation && !trackingActive) {
       startTracking();
@@ -363,7 +343,6 @@ const BedSpaceNavigator = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">
-      {/* Header */}
       <div className="bg-gray-800 p-4 shadow-lg">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Navigation className="w-6 h-6" />
@@ -371,9 +350,7 @@ const BedSpaceNavigator = () => {
         </h1>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        {/* Sidebar */}
         <div className="lg:w-96 bg-gray-800 p-6 overflow-y-auto">
           {!bedLocation ? (
             <div className="space-y-4">
@@ -486,7 +463,6 @@ const BedSpaceNavigator = () => {
           )}
         </div>
 
-        {/* Map */}
         <div className="flex-1 relative">
           {bedLocation ? (
             <SimpleMap bedLocation={bedLocation} userLocation={userLocation} />
