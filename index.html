@@ -1,202 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en-AU">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Austin Boath | Passionate about Places</title>
-    <meta name="description" content="Urban & Regional Planning • Transport & Logistics • Creating better places in Adelaide and beyond.">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
-        
-        :root { --accent: #ff2d55; }
-        
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: #0a0a0a;
-            color: #e2e8f0;
-            line-height: 1.6;
-        }
-        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: -0.02em; }
-        
-        .hero {
-            height: 100vh;
-            background: linear-gradient(rgba(10,10,10,0.75), rgba(10,10,10,0.9)), url('https://picsum.photos/id/1015/2000/1200') center/cover;
-            display: flex;
-            align-items: center;
-            position: relative;
-        }
-        .hero-content {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 40px;
-        }
-        .hero h1 {
-            font-size: clamp(3.2rem, 8vw, 7rem);
-            line-height: 1.05;
-        }
-        .rotating {
-            font-size: 2.1rem;
-            color: var(--accent);
-            min-height: 80px;
-            font-weight: 600;
-        }
-        .tagline {
-            font-size: 1.45rem;
-            max-width: 620px;
-            margin: 28px 0 48px;
-            opacity: 0.95;
-        }
-        .cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 14px;
-            background: var(--accent);
-            color: white;
-            padding: 18px 48px;
-            border-radius: 9999px;
-            font-size: 1.25rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        .cta:hover { transform: translateY(-4px); box-shadow: 0 25px 50px rgba(255,45,85,0.35); }
-        
-        nav {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
-            padding: 22px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: 0.4s;
-        }
-        .nav-scrolled { background: rgba(10,10,10,0.97); backdrop-filter: blur(16px); }
-        
-        section { padding: 130px 5%; max-width: 1200px; margin: 0 auto; }
-        
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 28px;
-        }
-        .project-card {
-            background: #111;
-            border-radius: 20px;
-            padding: 32px;
-            transition: all 0.4s;
-        }
-        .project-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
-        }
-        
-        footer {
-            background: #050505;
-            padding: 100px 5% 60px;
-            text-align: center;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#121815">
+<meta name="description" content="Austin Boath, an urban planning student and video creator from Adelaide, South Australia.">
+<title>Austin Boath</title>
+<style>
+:root{color-scheme:dark;--paper:#121815;--ink:#f4f0e5;--muted:#bdc6bd;--accent:#b0dfbc;--rule:#46564c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,sans-serif}
+.page{width:min(100% - 2 * clamp(1.25rem,7vw,7rem),82rem);margin:auto;min-height:100vh;min-height:100svh;display:grid;grid-template-rows:auto 1fr auto}
+header,footer{padding-block:1.35rem;display:flex;align-items:center;gap:1rem}
+header{border-bottom:1px solid var(--rule)}
+.monogram{display:grid;place-items:center;width:2.75rem;height:2.75rem;border-radius:50%;background:var(--accent);color:#13231a;font-family:Georgia,serif;font-size:1.07rem}
+.location{color:var(--muted);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase}
+main{align-self:center;padding-block:clamp(3.5rem,10vh,8rem)}
+h1{font:400 clamp(3.75rem,12.4vw,11rem)/.89 Georgia,'Times New Roman',serif;letter-spacing:-.075em;margin:0 0 clamp(1.6rem,4vw,3rem)}
+h1 span{font-style:italic}
+p{max-width:36ch;font-size:clamp(1.05rem,2vw,1.32rem);line-height:1.55;margin:0 0 1.75rem;color:var(--muted);text-wrap:pretty}
+.watch{display:inline-flex;align-items:center;gap:1.35rem;padding:.85rem 1.2rem;min-height:48px;background:var(--accent);color:#13231a;border-radius:3px;text-decoration:none;font-weight:600}
+.watch:hover{background:#c9ecd1}
+.watch:focus-visible{outline:3px solid var(--ink);outline-offset:4px}
+footer{border-top:1px solid var(--rule);color:var(--muted);font-size:.85rem}
+@media(max-width:420px){h1 span{display:block}}
+</style>
 </head>
 <body>
-    <nav id="navbar">
-        <div style="font-size:1.6rem; font-weight:700;">Austin Boath</div>
-        <div style="display:flex; gap:36px; font-weight:500;">
-            <a href="#about" style="color:#e2e8f0; text-decoration:none;">About</a>
-            <a href="#projects" style="color:#e2e8f0; text-decoration:none;">Projects</a>
-            <a href="https://linkedin.com/in/austinboath" target="_blank" style="color:#e2e8f0; text-decoration:none;">LinkedIn</a>
-        </div>
-    </nav>
-
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Passionate about <span id="rotating" class="rotating">Places</span></h1>
-            <p class="tagline">Urban &amp; Regional Planning student building better cities from the ground up.</p>
-            
-            <a href="#about" class="cta">
-                Discover my work <i class="fas fa-arrow-right"></i>
-            </a>
-        </div>
-    </section>
-
-    <!-- SHORT BIO -->
-    <section id="about">
-        <h2 style="font-size:2.8rem; margin-bottom:40px; text-align:center;">Who I Am</h2>
-        <div style="max-width:720px; margin:0 auto; font-size:1.22rem; text-align:center; line-height:1.75;">
-            <p>I’m an Urban &amp; Regional Planning student at Flinders University and Treasurer of the Flinders Urban &amp; Regional Planning Collective. With hands-on experience in transport &amp; logistics, guest experience at Adelaide Oval, and a deep love for how cities work, I bring practical insight to complex planning challenges.</p>
-            <p style="margin-top:28px;">Beyond the professional world, I create content on YouTube, make music (including a full album), and love public speaking. I’m an avid road cyclist — chasing hills, exploring Adelaide’s suburbs and beyond, and diving into the data behind every ride. Living in Adelaide gives me a front-row seat to the challenges and opportunities shaping Australia’s cities.</p>
-        </div>
-    </section>
-
-    <!-- PROJECTS -->
-    <section id="projects" style="background:#111;">
-        <h2 style="font-size:2.8rem; text-align:center; margin-bottom:60px;">Projects &amp; Tools</h2>
-        
-        <div class="projects-grid">
-            <div class="project-card">
-                <h3 style="margin-bottom:12px;">CamHopper</h3>
-                <p style="opacity:0.85; margin-bottom:20px;">Adelaide-focused route planner that helps drivers avoid red light and speed cameras.</p>
-                <a href="https://austinboath.com/camhopper" style="color:var(--accent); font-weight:600;">Work In Progress →</a>
-            </div>
-            
-            <div class="project-card">
-                <h3 style="margin-bottom:12px;">Route Progress Tracker</h3>
-                <p style="opacity:0.85; margin-bottom:20px;">Self-hosted progress tracker for long-distance cycling routes and training goals.</p>
-                <a href="https://austinboath.com/OpenVirtualJourney" style="color:var(--accent); font-weight:600;">View Project →</a>
-            </div>
-            
-       <div class="project-card">
-    <h3 style="margin-bottom:12px;">LinkedIn</h3>
-    <p style="opacity:0.85; margin-bottom:20px;">My official LinkedIn Profile.</p>
-    <a href="https://www.linkedin.com/in/austinboath" style="color:var(--accent); font-weight:600;">Launch LinkedIn →</a>
+<div class="page">
+<header><span class="monogram" aria-hidden="true">AB</span><span class="location">Adelaide, South Australia</span></header>
+<main>
+<h1>Austin <span>Boath</span></h1>
+<p>I study urban planning and make videos about cities, roads and the places I travel to.</p>
+<a class="watch" href="https://www.youtube.com/@Austin_Boath">Watch on YouTube <span aria-hidden="true">↗</span></a>
+</main>
+<footer>austinboath.com</footer>
 </div>
-            </div>
-            
-            <div class="project-card">
-                <h3 style="margin-bottom:12px;">YouTube Channel</h3>
-                <p style="opacity:0.85; margin-bottom:20px;">Content exploring cities, transport, history, and creative experiments.</p>
-                <a href="https://youtube.com/channel/UCrfqjmnuF1KNYgrQG3yIchA" target="_blank" style="color:var(--accent); font-weight:600;">Watch Videos →</a>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <p style="font-size:2.4rem; margin-bottom:24px;">Let's shape better places together.</p>
-        <p>Burnside, South Australia • Open to opportunities in planning, policy, and transport</p>
-        
-        <div style="margin:50px 0 30px; display:flex; justify-content:center; gap:30px; flex-wrap:wrap;">
-            <a href="https://linkedin.com/in/austinboath" target="_blank" style="color:#94a3b8;">LinkedIn</a>
-            <a href="https://youtube.com/@austinboath" target="_blank" style="color:#94a3b8;">YouTube</a>
-            <a href="#" style="color:#94a3b8;">GitHub</a>
-            <a href="mailto:contact@austinboath.com" style="color:#94a3b8;">Email</a>
-        </div>
-        
-        <p style="opacity:0.4; font-size:0.95rem;">© Austin Boath 2026</p>
-    </footer>
-
-    <script>
-        // Navbar
-        window.addEventListener('scroll', () => {
-            document.getElementById('navbar').classList.toggle('nav-scrolled', window.scrollY > 80);
-        });
-        
-        // Rotating text
-        const phrases = ["Places", "Geography", "History", "Urban Planning", "Policy", "Transport & Logistics"];
-        let i = 0;
-        const rotator = document.getElementById('rotating');
-        
-        function rotateText() {
-            rotator.style.opacity = 0;
-            setTimeout(() => {
-                i = (i + 1) % phrases.length;
-                rotator.textContent = phrases[i];
-                rotator.style.opacity = 1;
-            }, 400);
-        }
-        setInterval(rotateText, 2800);
-    </script>
 </body>
 </html>
