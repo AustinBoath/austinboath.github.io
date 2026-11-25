@@ -1,0 +1,22 @@
+title: Austin Boath
+url: "https://www.austinboath.com"
+description: "Personal website and blog of Austin Boath."
+
+theme: jekyll-theme-primer
+
+github:
+  is_project_page: false
+  is_user_page: false
+
+show_downloads: false
+
+permalink: /blog/:title/
+
+markdown: kramdown
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: default
